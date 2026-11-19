@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Solicitações online · Tec Lab</title>
+<meta name="theme-color" content="#2f7d46">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Tec Lab">
+<style>
+:root{
+  --verde:#2f7d46; --verde-esc:#1d5a31; --pill:#b9dfbd; --pill-txt:#1f4d2c; --papel:#ffffff;
+  --fundo:#eef3ee; --linha:#8fa293; --txt:#1f2a22; --suave:#5f6f63; --erro:#b3261e; --aviso:#9a6700;
+  --serif: Georgia, "Times New Roman", Times, serif;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--fundo);color:var(--txt);font-family:var(--sans);font-size:16px;-webkit-text-size-adjust:100%}
+a{color:var(--verde-esc)}
+button{font:inherit;cursor:pointer}
+input,select,textarea{font:inherit;color:inherit}
+.oculto{display:none!important}
+
+/* barra superior */
+.topo{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid #d6e3d8;display:flex;align-items:center;gap:12px;padding:8px 14px;padding-top:max(8px,env(safe-area-inset-top))}
+.topo img{height:34px}
+.topo .tit{font-family:var(--serif);font-size:17px;color:var(--verde-esc);line-height:1.1}
+.topo .tit small{display:block;font-family:var(--sans);font-size:12px;color:var(--suave)}
+.topo .esp{flex:1}
+.menu-btn{background:none;border:1px solid #cfdcd1;border-radius:8px;padding:6px 10px;color:var(--verde-esc)}
+.menu{position:absolute;right:12px;top:54px;background:#fff;border:1px solid #d6e3d8;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.12);min-width:220px;overflow:hidden}
+.menu a,.menu button{display:block;width:100%;text-align:left;padding:11px 16px;background:none;border:0;text-decoration:none;color:var(--txt)}
+.menu a:hover,.menu button:hover{background:#f1f7f1}
+.menu .quem{padding:10px 16px;font-size:13px;color:var(--suave);border-bottom:1px solid #eee}
+
+.demo-faixa{background:#fff6d6;color:#6b5200;font-size:13px;padding:6px 14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.demo-faixa label{display:flex;gap:6px;align-items:center}
+
+main{max-width:1000px;margin:0 auto;padding:16px 12px 120px}
+
+/* folha estilo requisição */
+.folha{background:var(--papel);border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,.08);padding:22px 22px 26px;margin-bottom:16px}
+.cab{display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap}
+.cab .marca{width:200px;text-align:center}
+.cab .marca img{width:180px;display:block;margin:0 auto}
+.cab .marca div{font-size:12px;color:#3d4a40;letter-spacing:.3px;margin-top:4px}
+.cab .dir{flex:1;min-width:260px;text-align:center}
+.cab h1{font-family:var(--serif);font-weight:normal;font-size:30px;margin:4px 0 2px;color:#222}
+.cab .agende{font-family:var(--serif);font-weight:bold;font-size:17px;color:#333;text-decoration:none}
+.cab .agende:hover{text-decoration:underline}
+.flags{display:flex;gap:14px 22px;justify-content:center;flex-wrap:wrap;margin-top:14px;font-family:var(--serif);font-size:20px}
+.flags label{display:flex;align-items:center;gap:6px;cursor:pointer}
+.urg{background:var(--verde);color:#fff;padding:2px 8px;font-weight:bold}
+.urg+small{font-size:14px}
+
+.pill{display:inline-block;background:var(--pill);color:var(--pill-txt);font-family:var(--serif);font-size:19px;padding:4px 12px;border-radius:9px;white-space:nowrap}
+.pill.sec{font-weight:bold;font-size:16px;letter-spacing:.3px;text-transform:uppercase;padding:5px 14px}
+.lin{display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap;margin-top:12px}
+.campo{display:flex;align-items:flex-end;gap:8px;flex:1 1 220px;min-width:0}
+.campo.curto{flex:0 1 170px}
+.campo.medio{flex:1 1 200px}
+input.ln, select.ln{border:0;border-bottom:1.5px solid var(--linha);background:transparent;padding:6px 2px;outline:none;flex:1;min-width:0;font-size:17px}
+input.ln:focus,select.ln:focus,textarea:focus{border-color:var(--verde)}
+.seg{display:flex;gap:4px}
+.seg label{border:1.5px solid var(--linha);border-radius:7px;padding:4px 12px;cursor:pointer;font-family:var(--serif);font-size:18px}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg label:has(input:checked){background:var(--verde);border-color:var(--verde);color:#fff}
+.cert{font-family:var(--serif);font-style:italic;font-size:14px;color:#444;display:flex;gap:8px;align-items:flex-start;margin-top:12px}
+.data{font-family:var(--serif);font-weight:bold;font-size:16px;margin-left:auto}
+
+.div{border:0;border-top:1.5px solid #6e7b70;margin:22px 0 14px;position:relative}
+.secao{margin-top:6px}
+.secao-cab{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:10px}
+.secao-cab .regua{flex:1;border-bottom:1.5px solid var(--linha);min-width:40px;margin-bottom:6px}
+.grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(225px,1fr));gap:2px 18px}
+.grade.larga{grid-template-columns:repeat(auto-fill,minmax(320px,1fr))}
+.item{padding:3px 0}
+.ck{display:flex;align-items:flex-start;gap:8px;cursor:pointer;font-family:var(--serif);font-size:17px;line-height:1.25}
+.ck input{appearance:none;-webkit-appearance:none;width:20px;height:20px;border:1.5px solid #555;border-radius:2px;flex:none;margin:1px 0 0;background:#fff;display:grid;place-content:center;cursor:pointer}
+.ck input:checked{background:var(--verde);border-color:var(--verde)}
+.ck input:checked::after{content:"";width:6px;height:11px;border:solid #fff;border-width:0 2.5px 2.5px 0;transform:rotate(45deg) translate(-1px,-1px)}
+.ck small{font-family:var(--sans);font-size:12px;color:var(--suave)}
+.ck .jejum{font-family:var(--sans);font-size:11px;font-weight:bold;background:#eef6ee;border-radius:4px;padding:1px 5px;color:var(--verde-esc);white-space:nowrap}
+.sub{display:none;flex-wrap:wrap;gap:6px 8px;align-items:center;margin:4px 0 6px 28px}
+.item.on .sub{display:flex}
+.sub input[type=text]{border:0;border-bottom:1.5px solid var(--linha);padding:4px 2px;font-size:15px;min-width:120px;flex:1;outline:none;background:transparent}
+.chips{display:flex;gap:4px;flex-wrap:wrap}
+.chips label{border:1.5px solid var(--linha);border-radius:6px;padding:2px 9px;font-size:14px;cursor:pointer;user-select:none}
+.chips input{position:absolute;opacity:0;pointer-events:none}
+.chips label:has(input:checked){background:var(--verde);color:#fff;border-color:var(--verde)}
+.texto-livre input{border:0;border-bottom:1.5px solid var(--linha);padding:4px 2px;font-size:15px;flex:1;outline:none;background:transparent}
+.nota{font-family:var(--serif);font-size:15px;color:#333;text-align:center;margin:8px 0 0}
+.nota.dir{text-align:right;font-style:italic;font-size:13px}
+.obs{display:flex;gap:8px;align-items:flex-end;margin-top:10px;font-family:var(--serif);font-size:16px}
+.obs input{flex:1}
+.subtit{font-family:var(--serif);font-weight:bold;font-size:15px;color:var(--pill-txt);margin:14px 0 6px;text-transform:uppercase}
+.lab-tit{font-family:var(--serif);font-weight:bold;font-size:22px;letter-spacing:.5px;margin:4px 0 8px}
+textarea{width:100%;border:1.5px solid #c9d6cb;border-radius:8px;padding:8px 10px;font-size:16px;min-height:70px;resize:vertical;outline:none;background:#fff}
+
+.mapa-wrap{display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start;margin-top:10px}
+.mapa{position:relative;width:320px;max-width:100%;user-select:none}
+.mapa .rot{display:flex;justify-content:space-around;font-family:var(--serif);font-size:20px;margin-bottom:4px}
+.mapa .img{position:relative;cursor:crosshair}
+.mapa img{width:100%;display:block}
+.mapa .ponto{position:absolute;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;background:#d93025;color:#fff;font-size:12px;font-weight:bold;display:grid;place-content:center;box-shadow:0 0 0 2px #fff;cursor:pointer}
+.mapa .dica{font-size:12px;color:var(--suave);margin-top:4px}
+.locais{flex:1;min-width:260px}
+.locais .pill{font-size:15px;font-weight:bold}
+
+/* barra fixa de envio */
+.barra{position:fixed;left:0;right:0;bottom:0;z-index:15;background:#fff;border-top:1px solid #d6e3d8;padding:10px 14px;padding-bottom:max(10px,env(safe-area-inset-bottom));display:flex;align-items:center;gap:10px;justify-content:center}
+.barra .cont{font-size:14px;color:var(--suave);margin-right:auto;max-width:520px}
+.barra-in{max-width:1000px;width:100%;display:flex;align-items:center;gap:10px}
+.btn{border:0;border-radius:9px;padding:11px 18px;background:var(--verde);color:#fff;font-weight:600;font-size:15px}
+.btn:hover{background:var(--verde-esc)}
+.btn.sec{background:#fff;color:var(--verde-esc);border:1.5px solid #b8cdbb}
+.btn.sec:hover{background:#f2f8f2}
+.btn.perigo{background:#fff;color:var(--erro);border:1.5px solid #e6b8b4}
+.btn.peq{padding:7px 12px;font-size:14px}
+.btn:disabled{opacity:.55;cursor:default}
+
+.nav-secoes{display:flex;gap:6px;overflow-x:auto;padding:2px 0 10px;scrollbar-width:none}
+.nav-secoes a{flex:none;font-size:13px;text-decoration:none;background:#fff;border:1px solid #cfe0d2;border-radius:20px;padding:5px 12px;color:var(--verde-esc)}
+
+/* login */
+.login{max-width:420px;margin:30px auto;background:#fff;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,.08);padding:26px 24px}
+.login img{width:170px;display:block;margin:0 auto 4px}
+.login .sub-marca{text-align:center;font-size:12px;color:#3d4a40;margin-bottom:14px}
+.login h2{font-family:var(--serif);font-weight:normal;text-align:center;margin:6px 0 18px;font-size:24px}
+.f{display:block;margin-bottom:12px}
+.f span{display:block;font-size:13px;color:var(--suave);margin-bottom:4px}
+.f input{width:100%;border:1.5px solid #c9d6cb;border-radius:8px;padding:10px 11px;font-size:16px;outline:none}
+.f input:focus{border-color:var(--verde)}
+.login .btn{width:100%;margin-top:4px}
+.login .alt{text-align:center;margin-top:14px;font-size:14px}
+.msg{border-radius:8px;padding:10px 12px;font-size:14px;margin-bottom:12px}
+.msg.erro{background:#fdecea;color:var(--erro)}
+.msg.ok{background:#e8f4ea;color:var(--verde-esc)}
+.msg.aviso{background:#fff6d6;color:#6b5200}
+
+/* listas */
+.cab-lista{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:4px 0 14px}
+.cab-lista h2{font-family:var(--serif);font-weight:normal;font-size:24px;margin:0;flex:1}
+.cartao{background:#fff;border-radius:10px;box-shadow:0 1px 3px rgba(0,0,0,.07);padding:14px 16px;margin-bottom:10px;display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap}
+.cartao .info{flex:1;min-width:220px}
+.cartao .t{font-weight:600;font-size:16px}
+.cartao .m{font-size:13px;color:var(--suave);margin-top:3px}
+.cartao .ex{font-size:14px;margin-top:6px}
+.cartao .acoes{display:flex;gap:6px;flex-wrap:wrap}
+.st{display:inline-block;font-size:12px;font-weight:700;border-radius:20px;padding:3px 10px;white-space:nowrap}
+.st.enviada{background:#fff1c2;color:#7a5a00}
+.st.aceita{background:#dbeafe;color:#1e40af}
+.st.cadastrada{background:#d9f0dd;color:#1d5a31}
+.st.recusada{background:#fde2e0;color:#9b1c13}
+.st.cancelada{background:#eceeec;color:#666}
+.tag-urg{background:var(--verde);color:#fff;font-size:11px;font-weight:700;border-radius:4px;padding:2px 6px;margin-left:6px}
+.vazio{text-align:center;color:var(--suave);padding:40px 10px;background:#fff;border-radius:10px}
+
+.abas{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.abas button{border:1px solid #cfe0d2;background:#fff;border-radius:20px;padding:6px 14px;font-size:14px;color:var(--verde-esc)}
+.abas button.on{background:var(--verde);border-color:var(--verde);color:#fff}
+.abas .n{font-weight:700;margin-left:4px}
+.busca{border:1.5px solid #c9d6cb;border-radius:9px;padding:9px 12px;font-size:15px;min-width:220px;flex:1;max-width:340px;outline:none}
+.tabela{width:100%;border-collapse:collapse;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.07);font-size:14px}
+.tabela th{background:#f1f7f1;text-align:left;font-weight:600;padding:9px 10px;color:var(--pill-txt);font-size:13px}
+.tabela td{padding:9px 10px;border-top:1px solid #edf1ed;vertical-align:top}
+.tabela tr.click{cursor:pointer}
+.tabela tr.click:hover td{background:#f7fbf7}
+.tabela tr.novo td{background:#fffbea}
+
+/* visualização */
+.ver-cab{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.ver-cab .esp{flex:1}
+.cod{font-family:var(--serif);font-size:22px;color:var(--verde-esc)}
+.dados-grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px 18px;margin-top:12px}
+.dado span{display:block;font-size:12px;color:var(--suave);text-transform:uppercase;letter-spacing:.3px}
+.dado b{font-weight:600;font-size:16px}
+.ver-sec{margin-top:16px}
+.ver-sec ul{margin:6px 0 0;padding-left:20px}
+.ver-sec li{margin:3px 0;font-family:var(--serif);font-size:17px}
+.ver-sec li small{font-family:var(--sans);color:#444;font-size:14px}
+.acoes-equipe{background:#fff;border:2px solid var(--pill);border-radius:10px;padding:14px;margin-bottom:14px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.acoes-equipe .esp{flex:1;min-width:180px;font-size:14px}
+.rodape{text-align:center;font-family:var(--serif);font-weight:bold;font-size:14px;color:#333;margin-top:22px;line-height:1.6}
+.rodape a{color:inherit}
+
+/* modal */
+.modal-fundo{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:50;display:grid;place-items:center;padding:16px}
+.modal{background:#fff;border-radius:12px;max-width:460px;width:100%;padding:20px}
+.modal h3{margin:0 0 10px;font-family:var(--serif);font-weight:normal;font-size:22px}
+.modal .bts{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#1f2a22;color:#fff;padding:10px 16px;border-radius:8px;z-index:60;font-size:14px;box-shadow:0 4px 14px rgba(0,0,0,.2)}
+.carregando{text-align:center;padding:50px;color:var(--suave)}
+
+@media (max-width:640px){
+  .folha{padding:16px 14px 20px}
+  .cab .marca{width:100%}
+  .cab h1{font-size:24px}
+  .flags{font-size:17px;gap:10px 16px}
+  .pill{font-size:16px}
+  .campo,.campo.curto,.campo.medio{flex:1 1 100%}
+  .tabela .opc{display:none}
+}
+@media print{
+  body{background:#fff}
+  .topo,.demo-faixa,.barra,.nao-imprimir,.acoes-equipe{display:none!important}
+  main{padding:0;max-width:none}
+  .folha{box-shadow:none;padding:0}
+  .pill{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+<div id="app"><div class="carregando">Carregando…</div></div>
+
+<script type="module">
+/* ================== CONFIGURAÇÃO ================== */
+const CONFIG = {
+  SUPABASE_URL: 'https://ynxjijzqesacqqswhrrk.supabase.co',        // ex.: https://xxxx.supabase.co
+  SUPABASE_ANON_KEY: 'sb_publishable_JmStJxccyTeh4gp-xACTcA_vNE5Kgrd',   // chave pública "anon" do projeto
+  WHATSAPP: '5519999680358'
+};
+const DEMO = !CONFIG.SUPABASE_URL;
+const LOGO = 'data:image/png;base64,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';
+const CORPO = 'data:image/png;base64,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';
+
+/* ================== CATÁLOGO (igual à requisição em papel) ================== */
+const LADO = ['D','E'];
+const QR = ['Quimio','Radio'];
+const P = (n, x={}) => ({n, ...x});
+const CATALOGO = [
+  {id:'rx', titulo:'Radiografia Simples', grupo:'Imagem', ancora:'img', itens:[
+    P('Tórax',{proj:1}),P('Região de Laringe',{proj:1}),P('Abdômen',{proj:1}),P('Ombro',{lado:1,proj:1}),P('Úmero',{lado:1,proj:1}),
+    P('Cotovelo',{lado:1,proj:1}),P('Rádio-Ulna',{lado:1,proj:1}),P('Carpo-Metacarpo',{lado:1,proj:1}),
+    P('Coluna Cervical',{proj:1}),P('Coluna Cervicotorácica',{proj:1}),P('Coluna Torácica',{proj:1}),P('Coluna Toracolombar',{proj:1}),
+    P('Coluna Lombar',{proj:1}),P('Coluna Lombossacral',{proj:1}),P('Coluna Coccígea',{proj:1}),
+    P('Pelve',{proj:1}),P('Fêmur',{lado:1,proj:1}),P('Joelho',{lado:1,proj:1}),P('Tíbia-Fíbula',{lado:1,proj:1}),P('Tarso-Metatarso',{lado:1,proj:1}),
+    P('Crânio – ATM',{proj:1,sed:1}),P('Crânio – Bulas Timpânicas',{proj:1,sed:1}),P('Crânio – Vias Aéreas Sup.',{proj:1}),
+    P('Crânio – Calota Craniana',{proj:1}),P('Crânio – Cavidade Oral',{proj:1,sed:1}),P('Outros',{texto:1,proj:1})],
+    sedacao:1, obs:1,
+    notas:['* Necessário sedação','Caso não seja(m) especificado(s) o(s) e a(s) projeção(ões) radiográfica(s), caberá ao radiologista definir a(s) mais apropriada(s).']},
+  {id:'us', titulo:'Ultrassonografia', grupo:'Imagem', itens:[
+    P('US Abdômen'),P('US Tórax'),P('US Cervical'),P('US Ortopédico'),P('US Contraste Microbolhas'),P('Citologia Guiada')],
+    obs:1, notas:['Informe-se sobre o preparo adequado do paciente para a realização da ultrassonografia abdominal.']},
+  {id:'cardio', titulo:'Exames Cardiológicos', grupo:'Cardiologia', ancora:'cardio', itens:[
+    P('Ecodopplercardiograma'),P('Eletrocardiograma'),P('Aferição de Pressão Arterial'),P('Holter')]},
+  {id:'esp', titulo:'Especialidades (Consulta)', grupo:'Especialidades', itens:[
+    P('Cardiologia'),P('Nefrologista'),P('Neurologista'),P('Endocrinologista'),P('Dermatologia'),P('Gastroenterologia')]},
+  {id:'pato', titulo:'Patologia', grupo:'Patologia', ancora:'pato', itens:[
+    P('Análise Citológica (CAAF)'),P('Histopatológico',{opts:['Com margem cirúrgica']}),P('Histopatológico Frag. Endoscopia')],
+    patologia:1},
+  {id:'perfis', titulo:'Perfis', grupo:'Laboratório', ancora:'lab', lab:1, larga:1, itens:[
+    P('Perfil Renal',{d:'Ureia e Creatinina'}),P('Perfil Hepático Reduzido',{d:'ALT, AST, FA'}),
+    P('Perfil Hepático Canino',{d:'ALT, AST, FA, Proteína, Alb, Bil'}),P('Perfil Hepático Felino',{d:'ALT, GGT, FA, Proteína, Alb, Bil'}),
+    P('Perfil Tec Lab',{d:'Hemograma 1, ALT, Creatinina'}),P('Perfil Tec Lab 2',{d:'Hemograma 1, ALT, FA, Ureia, Creatinina'}),
+    P('Perfil Pancreático',{d:'Amilase, Lipase, Creatinina, Potássio'}),P('Perfil Renal Agudo',{d:'Ureia, Creatinina, Urinálise'}),
+    P('Perfil Renal Crônico',{d:'Ureia, Creatinina, Na, K, Cálcio, Fósforo'}),P('Perfil Eletrolítico',{d:'Na, K, Cálcio, Fósforo'}),
+    P('Perfil Eletrolítico 2',{d:'Na, K, Cálcio Iônico, Cloro'}),
+    P('Perfil Geriátrico',{d:'Hemograma 1, Urinálise, ALT, FA, Ureia, Creatinina, Colesterol, Glicose',jejum:1}),
+    P('Perfil Geriátrico (sem urina)',{d:'Hemograma 1, ALT, FA, Ureia, Creatinina, Colesterol, Glicose',jejum:1}),
+    P('Perfil Hipotireoidismo',{d:'TSH, T4 Livre, Colesterol, Triglicérides',jejum:1}),
+    P('Perfil Emergência',{d:'Hemograma 1, Ureia, Creatinina, ALT, FA, Glicose',jejum:1}),
+    P('Perfil Pré-Cirúrgico',{d:'Hemograma 1, Ureia, Creatinina'})]},
+  {id:'hemato', titulo:'Hematologia', grupo:'Laboratório', lab:1, itens:[
+    P('Hemograma 1 (PLAQ)'),P('Hemograma 3 (PLAQ, PPT, Pesq. Hematozoário)'),P('Leucograma'),P('Pesq. de Hematozoário'),P('Contagem de Reticulócito')]},
+  {id:'coag', titulo:'Coagulograma', grupo:'Laboratório', lab:1, itens:[
+    P('Tempo de Coagulação'),P('TTPA/TP/Fibrinogênio'),P('Outros',{texto:1})]},
+  {id:'bioq', titulo:'Bioquímica', grupo:'Laboratório', lab:1, itens:[
+    P('Ácido Fólico'),P('Albumina'),P('ALT (TGP)'),P('Amilase'),P('AST (TGO)'),P('Bilirrubinas – Total, Direta e Indireta'),P('Cálcio Total'),P('Cálcio Iônico'),
+    P('Creatinina'),P('CPK – Creatinofosfoquinase'),P('Cloro (Cloretos)'),P('Colesterol Total'),P('Colesterol Total e Frações'),P('Ferro Sérico'),P('Fosfatase Alcalina'),P('Fósforo'),
+    P('Frutosamina'),P('Gama GT'),P('Glicohemoglobina'),P('Glicose/Glicemia'),P('Lipase'),P('Magnésio'),P('Potássio'),P('Proteína Total e Frações'),
+    P('Sódio'),P('Triglicérides'),P('Ureia'),P('Vitamina B12'),P('Vitamina D3'),P('SDMA'),P('Outros',{texto:1})]},
+  {id:'urina', titulo:'Urinálise', grupo:'Laboratório', lab:1, itens:[
+    P('Urinálise'),P('Urocultura e Antibiograma'),P('UP/C – Relação Proteína/Creatinina'),P('Análise de Cálculos')]},
+  {id:'fezes', titulo:'Fezes', grupo:'Laboratório', lab:1, itens:[
+    P('Coproparasitológico de Fezes – 1 amostra'),P('Coproparasitológico de Fezes – Amostra Seriada (3 amostras)'),P('Combo Tripsina'),P('Teste Rápido Giardia (AG)')]},
+  {id:'micro', titulo:'Microbiologia / Parasitologia', grupo:'Laboratório', lab:1, itens:[
+    P('Cultura e Antibiograma',{local:1}),P('Cultura de Fungos',{local:1}),P('Pesquisa de Malassezia sp',{local:1}),P('Coloração Gram',{local:1}),
+    P('Pesquisa Ectoparasita (RASPADO)'),P('Pesquisa de Microfilárias (SANGUE)')]},
+  {id:'imuno', titulo:'Imunologia', grupo:'Laboratório', lab:1, itens:[
+    P('4DX (Ehrlichia, Anaplasma, Lyme, Dirofilária)'),P('Cromatográfico de Cinomose (AG)'),P('Cromatográfico de Ehrlichia (AC)'),
+    P('Cromatográfico de FIV + FeLV',{opts:['AC','AG']}),P('Cromatográfico de Leishmaniose (AG)'),P('Cromatográfico de Parvovirose (AG)'),
+    P('Sorologia Anaplasma IgG'),P('Sorologia Ehrlichia',{opts:['IgG','IgM']}),P('Sorologia Babesia',{opts:['IgG','IgM']}),
+    P('Sorologia Leishmaniose Diluição Total'),P('Sorologia Titulação Ehrlichia Elisa'),P('Outros',{texto:1})]},
+  {id:'pcr', titulo:'Biologia Molecular', grupo:'Laboratório', lab:1, itens:[
+    P('PCR Anaplasma spp'),P('PCR Ehrlichia canis'),P('PCR Ehrlichia spp'),P('PCR Babesia canis'),P('PCR Ehrlichia, Babesia, Anaplasma'),
+    P('PCR Cinomose'),P('PCR FIV + FeLV'),P('PCR Leishmaniose spp'),P('PCR Mycoplasma haemofelis'),P('PCR Parvovirose'),P('PCR PIF (efusão)')]},
+  {id:'endo', titulo:'Endocrinologia', grupo:'Laboratório', lab:1, itens:[
+    P('Ácidos Biliares 1 Dosagem'),P('Ácidos Biliares 2 Dosagens'),P('TSH',{opts:QR}),P('T4 Livre',{opts:QR}),P('T4 Total',{opts:QR}),
+    P('T4 Livre por Diálise'),P('T4 Total pós Levotiroxina',{opts:QR}),P('T3',{opts:QR}),P('Cortisol Basal',{opts:QR}),
+    P('Sup. Dexametasona 2 dosagens',{opts:QR}),P('Sup. Dexametasona 3 dosagens',{opts:QR}),P('Estimulação por ACTH',{opts:QR,obsTxt:'Consultar peso'})],
+    encaminhar:['Hormonalle','PROVET','TECSA']},
+];
+const LOCAIS_BIOPSIA = ['Gengiva','Glândula Adanal','Glândula Mamária','Intestino','Linfonodo','Olho','Osso','Pavilhão Auricular','Pele','Pênis','Subcutâneo','Testículo','Vulva'];
+const STATUS = {
+  enviada:{t:'Aguardando aceite', c:'enviada'},
+  aceita:{t:'Aceita pela recepção', c:'aceita'},
+  cadastrada:{t:'Cadastrada', c:'cadastrada'},
+  recusada:{t:'Recusada', c:'recusada'},
+  cancelada:{t:'Cancelada', c:'cancelada'},
+};
+
+/* ================== UTILIDADES ================== */
+const $ = (s, r=document) => r.querySelector(s);
+const $$ = (s, r=document) => [...r.querySelectorAll(s)];
+const h = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const cod = id => 'SOL-' + String(id).padStart(5,'0');
+const dataBR = iso => iso ? new Date(iso).toLocaleDateString('pt-BR') : '';
+const horaBR = iso => iso ? new Date(iso).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}) : '';
+const dh = iso => iso ? dataBR(iso) + ' ' + horaBR(iso) : '';
+function toast(t, ms=2600){ const d=document.createElement('div'); d.className='toast'; d.textContent=t; document.body.appendChild(d); setTimeout(()=>d.remove(), ms); }
+function modal({titulo, html='', campos=[], ok='Confirmar', cancelar='Voltar', perigo=false}){
+  return new Promise(res=>{
+    const f=document.createElement('div'); f.className='modal-fundo';
+    f.innerHTML=`<div class="modal"><h3>${h(titulo)}</h3>${html}${campos.map(c=>`<label class="f"><span>${h(c.rotulo)}</span><input data-k="${c.k}" value="${h(c.valor||'')}" placeholder="${h(c.ph||'')}"></label>`).join('')}
+      <div class="msg erro oculto"></div><div class="bts"><button class="btn sec">${h(cancelar)}</button><button class="btn ${perigo?'perigo':''}">${h(ok)}</button></div></div>`;
+    document.body.appendChild(f);
+    const [bC,bO]=$$('.bts button',f); const inp=$$('input',f);
+    if(inp[0]) setTimeout(()=>inp[0].focus(),30);
+    bC.onclick=()=>{f.remove();res(null)};
+    bO.onclick=()=>{ const v={}; for(const i of inp){ v[i.dataset.k]=i.value.trim(); const c=campos.find(c=>c.k===i.dataset.k); if(c.obrig && !v[i.dataset.k]){ const m=$('.msg',f); m.textContent='Preencha: '+c.rotulo; m.classList.remove('oculto'); return; } } f.remove(); res(v); };
+  });
+}
+function traduzErro(e){
+  const m = (e && (e.message||e.error_description||e.msg)) || String(e);
+  if(/Invalid login credentials/i.test(m)) return 'E-mail ou senha incorretos.';
+  if(/already registered|already been registered/i.test(m)) return 'Este e-mail já tem cadastro. Use "Entrar" ou "Esqueci minha senha".';
+  if(/at least 6|Password should/i.test(m)) return 'A senha precisa ter pelo menos 6 caracteres.';
+  if(/Email not confirmed/i.test(m)) return 'Confirme seu e-mail pelo link que enviamos antes de entrar.';
+  if(/rate limit|too many/i.test(m)) return 'Muitas tentativas em pouco tempo. Aguarde alguns minutos e tente de novo.';
+  if(/valid email|invalid format|Unable to validate email/i.test(m)) return 'E-mail inválido.';
+  if(/Failed to fetch|NetworkError|network/i.test(m)) return 'Sem conexão com o servidor. Verifique a internet e tente de novo.';
+  return m;
+}
+
+/* ================== BACKEND: SUPABASE ================== */
+function backendSupabase(){
+  let sb, uidCache=null;
+  const pronto = import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm').then(m=>{ sb=m.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY); return sb; });
+  const ok = ({data,error}) => { if(error) throw error; return data; };
+  const self = {
+    pronto,
+    onAuth(cb){ pronto.then(()=>sb.auth.onAuthStateChange((ev)=>cb(ev))); },
+    async sessao(){ await pronto; const {data}=await sb.auth.getSession(); uidCache=data.session?.user?.id||null; return data.session ? {uid:data.session.user.id, email:data.session.user.email} : null; },
+    async entrar(email,senha){ await pronto; ok(await sb.auth.signInWithPassword({email,password:senha})); },
+    async criarConta(email,senha,perfil){ await pronto; const d=ok(await sb.auth.signUp({email,password:senha,options:{data:perfil,emailRedirectTo:location.origin+location.pathname}})); return !!d.session; },
+    async esqueci(email){ await pronto; ok(await sb.auth.resetPasswordForEmail(email,{redirectTo:location.origin+location.pathname})); },
+    async novaSenha(senha){ await pronto; ok(await sb.auth.updateUser({password:senha})); },
+    async sair(){ await pronto; await sb.auth.signOut(); },
+    async perfil(){ const s=await self.sessao(); if(!s) return null; return ok(await sb.from('perfis').select('*').eq('id',s.uid).maybeSingle()) || {id:s.uid,email:s.email}; },
+    async salvarPerfil(p){ const s=await self.sessao(); ok(await sb.from('perfis').upsert({...p, id:s.uid, email:s.email})); },
+    async ehEquipe(){ await pronto; const {data,error}=await sb.rpc('is_equipe'); return !error && !!data; },
+    async criar(linha){ await pronto; return ok(await sb.from('solicitacoes').insert(linha).select().single()); },
+    async minhas(){ const s=await self.sessao(); return ok(await sb.from('solicitacoes').select('*').eq('user_id',s.uid).order('criado_em',{ascending:false}).limit(300)); },
+    async todas(status){ await pronto; let q=sb.from('solicitacoes').select('*').order('criado_em',{ascending:false}).limit(1000); if(status) q=q.eq('status',status); return ok(await q); },
+    async contar(status){ await pronto; const {count}=await sb.from('solicitacoes').select('id',{count:'exact',head:true}).eq('status',status); return count||0; },
+    async obter(id){ await pronto; return ok(await sb.from('solicitacoes').select('*').eq('id',id).maybeSingle()); },
+    async atualizar(id,patch){ await pronto; return ok(await sb.from('solicitacoes').update(patch).eq('id',id).select().single()); },
+    async uid(){ if(uidCache) return uidCache; const s=await self.sessao(); return s?.uid; },
+  };
+  return self;
+}
+
+/* ================== BACKEND: DEMONSTRAÇÃO (sem servidor) ================== */
+function backendDemo(){
+  const mem={};
+  const ler=(k,d)=>{ try{ const v=localStorage.getItem(k); return v?JSON.parse(v):(mem[k]??d); }catch{ return mem[k]??d; } };
+  const gravar=(k,v)=>{ mem[k]=v; try{ localStorage.setItem(k,JSON.stringify(v)); }catch{} };
+  const cbs=[];
+  const self = {
+    pronto: Promise.resolve(),
+    onAuth(cb){ cbs.push(cb); },
+    async sessao(){ return ler('tl_demo_sessao',null); },
+    async entrar(email,senha){ const us=ler('tl_demo_users',{}); const u=Object.values(us).find(u=>u.email===email.toLowerCase()); if(!u||u.senha!==senha) throw new Error('Invalid login credentials'); gravar('tl_demo_sessao',{uid:u.uid,email:u.email}); },
+    async criarConta(email,senha,perfil){ email=email.toLowerCase(); const us=ler('tl_demo_users',{}); if(Object.values(us).some(u=>u.email===email)) throw new Error('already registered'); if(senha.length<6) throw new Error('Password should be at least 6'); const uid='u'+Date.now(); us[uid]={uid,email,senha}; gravar('tl_demo_users',us); const ps=ler('tl_demo_perfis',{}); ps[uid]={id:uid,email,...perfil}; gravar('tl_demo_perfis',ps); gravar('tl_demo_sessao',{uid,email}); return true; },
+    async esqueci(){ },
+    async novaSenha(){ },
+    async sair(){ gravar('tl_demo_sessao',null); cbs.forEach(c=>c('SIGNED_OUT')); },
+    async perfil(){ const s=await self.sessao(); return s ? (ler('tl_demo_perfis',{})[s.uid]||{id:s.uid,email:s.email}) : null; },
+    async salvarPerfil(p){ const s=await self.sessao(); const ps=ler('tl_demo_perfis',{}); ps[s.uid]={...ps[s.uid],...p}; gravar('tl_demo_perfis',ps); },
+    async ehEquipe(){ return !!ler('tl_demo_equipe',false); },
+    async criar(l){ const s=await self.sessao(); const all=ler('tl_demo_sol',[]); const id=(all.reduce((m,r)=>Math.max(m,r.id),0)||0)+1; const r={id,user_id:s.uid,criado_em:new Date().toISOString(),status:'enviada',...l}; all.push(r); gravar('tl_demo_sol',all); return r; },
+    async minhas(){ const s=await self.sessao(); return ler('tl_demo_sol',[]).filter(r=>r.user_id===s.uid).sort((a,b)=>b.id-a.id); },
+    async todas(st){ return ler('tl_demo_sol',[]).filter(r=>!st||r.status===st).sort((a,b)=>b.id-a.id); },
+    async contar(st){ return ler('tl_demo_sol',[]).filter(r=>r.status===st).length; },
+    async obter(id){ return ler('tl_demo_sol',[]).find(r=>r.id==id)||null; },
+    async atualizar(id,p){ const all=ler('tl_demo_sol',[]); const i=all.findIndex(r=>r.id==id); all[i]={...all[i],...p,atualizado_em:new Date().toISOString()}; gravar('tl_demo_sol',all); return all[i]; },
+    async uid(){ return (await self.sessao())?.uid; },
+    setEquipe(v){ gravar('tl_demo_equipe',!!v); },
+  };
+  return self;
+}
+
+const api = DEMO ? backendDemo() : backendSupabase();
+const estado = { perfil:null, equipe:false, recuperacao:false, painelFiltro:'enviada', busca:'', pollTimer:null };
+
+/* API para o Claude (skill de cadastro no WorkVet) */
+window.TecLabAPI = {
+  listar: (status='aceita') => api.todas(status),
+  obter: id => api.obter(id),
+  texto: async id => textoSolicitacao(await api.obter(id)),
+  marcarCadastrada: async (id, ficha) => api.atualizar(id, {status:'cadastrada', ficha_workvet:String(ficha), cadastrada_em:new Date().toISOString()}),
+};
+
+/* ================== MOLDURA ================== */
+const app = $('#app');
+function moldura(conteudo){
+  const p = estado.perfil || {};
+  const nome = p.clinica || p.nome || p.email || '';
+  app.innerHTML = `
+  ${DEMO ? `<div class="demo-faixa nao-imprimir"><b>Modo demonstração</b> — os dados ficam só neste navegador.
+     <label><input type="checkbox" id="demoEq" ${estado.equipe?'checked':''}> ver como equipe Tec Lab</label></div>`:''}
+  <header class="topo nao-imprimir">
+    <a href="#/"><img src="${LOGO}" alt="Tec Lab"></a>
+    <div class="tit">Solicitações online<small>${h(nome)}</small></div>
+    <div class="esp"></div>
+    ${estado.equipe ? `<a class="btn sec peq" href="#/painel">Painel</a>` : `<a class="btn peq" href="#/nova">+ Nova</a>`}
+    <button class="menu-btn" id="menuBtn" aria-label="Menu">☰</button>
+  </header>
+  <div id="menu" class="menu oculto nao-imprimir">
+    <div class="quem">${h(p.email||'')}</div>
+    ${estado.equipe?`<a href="#/painel">Painel Tec Lab</a>`:''}
+    <a href="#/nova">Nova solicitação</a>
+    <a href="#/minhas">Minhas solicitações</a>
+    <a href="#/perfil">Meu cadastro</a>
+    <a href="https://wa.me/${CONFIG.WHATSAPP}" target="_blank" rel="noopener">Falar com o Tec Lab (WhatsApp)</a>
+    <button id="sairBtn">Sair</button>
+  </div>
+  <main>${conteudo}</main>`;
+  $('#menuBtn').onclick = e => { e.stopPropagation(); $('#menu').classList.toggle('oculto'); };
+  document.addEventListener('click', ()=>$('#menu')?.classList.add('oculto'), {once:true});
+  $('#sairBtn').onclick = async ()=>{ await api.sair(); estado.perfil=null; estado.equipe=false; location.hash='#/'; rota(); };
+  const dq=$('#demoEq'); if(dq) dq.onchange=()=>{ api.setEquipe(dq.checked); estado.equipe=dq.checked; location.hash = dq.checked?'#/painel':'#/minhas'; rota(); };
+}
+
+/* ================== LOGIN / CADASTRO ================== */
+function telaLogin(modo='entrar', msg=''){
+  const blocos = {
+    entrar: `<h2>Entrar</h2>
+      <label class="f"><span>E-mail</span><input id="email" type="email" autocomplete="username" inputmode="email"></label>
+      <label class="f"><span>Senha</span><input id="senha" type="password" autocomplete="current-password"></label>
+      <button class="btn" id="ir">Entrar</button>
+      <div class="alt"><a href="#" data-m="criar">Criar conta da clínica / veterinário</a><br><br><a href="#" data-m="esqueci">Esqueci minha senha</a></div>`,
+    criar: `<h2>Criar conta</h2>
+      <p style="font-size:14px;color:var(--suave);margin-top:-8px">Cadastro para clínicas e médicos-veterinários que enviam exames ao Tec Lab.</p>
+      <label class="f"><span>Clínica (deixe em branco se atende sem clínica)</span><input id="clinica"></label>
+      <label class="f"><span>Médico(a)-veterinário(a) responsável</span><input id="nome" autocomplete="name"></label>
+      <label class="f"><span>CRMV</span><input id="crmv" inputmode="numeric"></label>
+      <label class="f"><span>WhatsApp</span><input id="telefone" type="tel" inputmode="tel" placeholder="(19) 9 0000-0000"></label>
+      <label class="f"><span>E-mail (será o seu login)</span><input id="email" type="email" autocomplete="username" inputmode="email"></label>
+      <label class="f"><span>Senha (mínimo 6 caracteres)</span><input id="senha" type="password" autocomplete="new-password"></label>
+      <button class="btn" id="ir">Criar conta</button>
+      <div class="alt"><a href="#" data-m="entrar">Já tenho conta</a></div>`,
+    esqueci: `<h2>Recuperar senha</h2>
+      <p style="font-size:14px;color:var(--suave);margin-top:-8px">Vamos enviar um link para você criar uma nova senha.</p>
+      <label class="f"><span>E-mail</span><input id="email" type="email" inputmode="email"></label>
+      <button class="btn" id="ir">Enviar link</button>
+      <div class="alt"><a href="#" data-m="entrar">Voltar</a></div>`,
+    nova: `<h2>Nova senha</h2>
+      <label class="f"><span>Nova senha (mínimo 6 caracteres)</span><input id="senha" type="password" autocomplete="new-password"></label>
+      <button class="btn" id="ir">Salvar senha</button>`,
+  };
+  app.innerHTML = `${DEMO?`<div class="demo-faixa"><b>Modo demonstração</b> — crie uma conta qualquer para testar; os dados ficam só neste navegador.</div>`:''}
+  <div class="login"><img src="${LOGO}" alt="Tec Lab"><div class="sub-marca">Centro Diagnóstico Veterinário</div>
+  <div class="msg ${msg?'':'oculto'} ${/enviad|criad|salva/i.test(msg)?'ok':'erro'}" id="msg">${h(msg)}</div>${blocos[modo]}</div>`;
+  $$('[data-m]').forEach(a=>a.onclick=e=>{e.preventDefault();telaLogin(a.dataset.m)});
+  const erro = t => { const m=$('#msg'); m.className='msg erro'; m.textContent=t; };
+  const btn=$('#ir');
+  $$('.login input').forEach(i=>i.addEventListener('keydown',e=>{ if(e.key==='Enter') btn.click(); }));
+  btn.onclick = async ()=>{
+    const v = id => ($('#'+id)?.value||'').trim();
+    btn.disabled=true;
+    try{
+      if(modo==='entrar'){ if(!v('email')||!v('senha')) throw new Error('Informe e-mail e senha.'); await api.entrar(v('email'), $('#senha').value); estado.perfil=null; location.hash='#/'; await rota(); }
+      else if(modo==='criar'){
+        if(!v('nome')) throw new Error('Informe o nome do(a) veterinário(a) responsável.');
+        if(!v('crmv')) throw new Error('Informe o CRMV.');
+        if(!v('email')) throw new Error('Informe o e-mail.');
+        const logou = await api.criarConta(v('email'), $('#senha').value, {nome:v('nome'), crmv:v('crmv'), clinica:v('clinica'), telefone:v('telefone')});
+        if(logou){ estado.perfil=null; location.hash='#/nova'; await rota(); }
+        else telaLogin('entrar','Conta criada! Enviamos um link de confirmação para o seu e-mail.');
+      }
+      else if(modo==='esqueci'){ if(!v('email')) throw new Error('Informe o e-mail.'); await api.esqueci(v('email')); telaLogin('entrar','Link enviado! Confira seu e-mail (e a caixa de spam).'); }
+      else if(modo==='nova'){ await api.novaSenha($('#senha').value); estado.recuperacao=false; history.replaceState(null,'',location.pathname); toast('Senha alterada.'); location.hash='#/'; await rota(); }
+    }catch(e){ erro(traduzErro(e)); btn.disabled=false; }
+  };
+}
+
+/* ================== FORMULÁRIO (aparência da requisição) ================== */
+function htmlItem(sec, it, i){
+  const k = `${sec.id}-${i}`;
+  let sub = '';
+  if(it.lado) sub += `<span class="chips">${LADO.map(l=>`<label><input type="checkbox" data-lado="${l}">${l==='D'?'Direito':'Esquerdo'}</label>`).join('')}</span>`;
+  if(it.opts) sub += `<span class="chips">${it.opts.map(o=>`<label><input type="checkbox" data-opt="${h(o)}">${h(o)}</label>`).join('')}</span>`;
+  if(it.texto) sub += `<input type="text" data-texto placeholder="Qual?">`;
+  if(it.proj) sub += `<input type="text" data-proj placeholder="Projeção (opcional)">`;
+  if(it.local) sub += `<input type="text" data-local placeholder="Local da coleta">`;
+  return `<div class="item" data-k="${k}">
+    <label class="ck"><input type="checkbox" data-ck><span>${h(it.n)}${it.lado?' D / E':''}${it.sed?'*':''}${it.d?`: <small>${h(it.d)}</small>`:''}${it.jejum?` <span class="jejum">Jejum 12h</span>`:''}${it.obsTxt?` <small>(${h(it.obsTxt)})</small>`:''}</span></label>
+    ${sub?`<div class="sub">${sub}</div>`:''}
+  </div>`;
+}
+function htmlSecao(sec){
+  let extra = '';
+  if(sec.sedacao) extra += `<span class="pill sec">Sedação</span><span class="chips" data-sedacao><label><input type="radio" name="sed" value="Sim">SIM</label><label><input type="radio" name="sed" value="Não">NÃO</label></span>`;
+  let corpo = `<div class="grade ${sec.larga?'larga':''}">${sec.itens.map((it,i)=>htmlItem(sec,it,i)).join('')}</div>`;
+  if(sec.encaminhar) corpo += `<div class="obs" style="font-family:var(--serif)"><b>Encaminhar para:</b> <span class="chips" data-encaminhar>${sec.encaminhar.map(e=>`<label><input type="radio" name="enc" value="${e}">${e}</label>`).join('')}<label><input type="radio" name="enc" value="">Indiferente</label></span></div>`;
+  if(sec.obs) corpo += `<div class="obs">Observação/Suspeita: <input class="ln" data-obs="${sec.id}"></div>`;
+  if(sec.notas) corpo += sec.notas.map((n,i)=>`<p class="nota ${n.startsWith('*')?'dir':''}">${h(n)}</p>`).join('');
+  if(sec.patologia) corpo += `
+    <div class="obs">Lesão: <input class="ln" data-pato="lesao"></div>
+    <div class="obs">Tempo de Evolução: <input class="ln" data-pato="tempo"></div>
+    <div class="obs">Observação/Suspeita: <input class="ln" data-pato="obs"></div>
+    <div class="mapa-wrap">
+      <div class="mapa"><div class="rot"><span>Ventral</span><span>Dorsal</span></div>
+        <div class="img" id="mapaImg"><img src="${CORPO}" alt="Silhueta ventral e dorsal"></div>
+        <div class="dica">Toque na silhueta para marcar o local. Toque no ponto para apagar.</div></div>
+      <div class="locais"><span class="pill">Identifique a localização da Biópsia ou Citologia</span>
+        <div class="grade" style="margin-top:10px;grid-template-columns:repeat(auto-fill,minmax(170px,1fr))">
+        ${LOCAIS_BIOPSIA.map(l=>`<label class="ck"><input type="checkbox" data-localbx="${h(l)}"><span>${h(l)}</span></label>`).join('')}
+        </div>
+        <div class="obs">Outro(s): <input class="ln" data-pato="outro_local"></div>
+      </div>
+    </div>`;
+  return `<section class="secao" id="s-${sec.id}" ${sec.ancora?`data-ancora="${sec.ancora}"`:''}>
+    <div class="secao-cab"><span class="pill sec">${h(sec.titulo)}</span>${sec.id==='rx'?'<span class="regua"></span>':''}${extra}</div>${corpo}</section>`;
+}
+
+async function telaForm(id, {modelo=false}={}){
+  let base = null;
+  if(id){ base = await api.obter(id); if(!base){ toast('Solicitação não encontrada.'); location.hash='#/minhas'; return; } }
+  if(base && !modelo && base.status!=='enviada'){ toast('Só dá para editar enquanto aguarda o aceite.'); location.hash='#/ver/'+id; return; }
+  const p = estado.perfil || {};
+  const hoje = new Date().toLocaleDateString('pt-BR');
+  const imagem = CATALOGO.filter(s=>!s.lab), lab = CATALOGO.filter(s=>s.lab);
+  moldura(`
+  <div class="nav-secoes nao-imprimir">
+    <a href="#" data-ir="topo-form">Paciente</a><a href="#" data-ir="s-rx">Radiografia</a><a href="#" data-ir="s-us">Ultrassom</a><a href="#" data-ir="s-cardio">Cardiologia</a>
+    <a href="#" data-ir="s-pato">Patologia</a><a href="#" data-ir="lab">Laboratório</a><a href="#" data-ir="s-endo">Endocrinologia</a><a href="#" data-ir="s-outros">Outros / Obs.</a>
+  </div>
+  ${base && !modelo ? `<div class="msg aviso">Editando ${cod(base.id)}. As alterações só valem enquanto a recepção não aceitar.</div>`:''}
+  ${modelo ? `<div class="msg aviso">Nova solicitação usando os exames de ${cod(base.id)} como modelo. Preencha os dados do paciente.</div>`:''}
+  <form id="form" autocomplete="off" onsubmit="return false">
+  <div class="folha" id="topo-form">
+    <div class="cab">
+      <div class="marca"><img src="${LOGO}" alt="Tec Lab"><div>Centro Diagnóstico Veterinário</div></div>
+      <div class="dir">
+        <h1>Requisição Individual de Exames</h1>
+        <a class="agende" href="https://wa.me/${CONFIG.WHATSAPP}?text=${encodeURIComponent('Olá! Gostaria de agendar um horário.')}" target="_blank" rel="noopener">Agende seu horário</a>
+        <div class="flags">
+          <label class="ck"><input type="checkbox" data-flag="convenio"><span>Convênio</span></label>
+          <label class="ck"><input type="checkbox" data-flag="pago"><span>Pago</span></label>
+          <label class="ck"><input type="checkbox" data-flag="petlove"><span>PET LOVE</span></label>
+          <label class="ck"><input type="checkbox" data-flag="urgente"><span><span class="urg">Urgente</span> <small>(com taxa)</small></span></label>
+        </div>
+      </div>
+    </div>
+    <div class="lin" style="margin-top:22px">
+      <div class="campo"><span class="pill">Nome do Paciente:</span><input class="ln" data-p="nome" required></div>
+      <div class="campo curto"><span class="pill">Sexo:</span><span class="seg"><label><input type="radio" name="sexo" value="M">M</label><label><input type="radio" name="sexo" value="F">F</label></span></div>
+      <div class="campo curto"><span class="pill">Idade:</span><input class="ln" data-p="idade" placeholder="ex.: 5 anos"></div>
+    </div>
+    <div class="lin">
+      <div class="campo" style="flex:0 1 auto"><span class="pill">Espécie:</span><span class="seg"><label><input type="radio" name="especie" value="Canina">Canina</label><label><input type="radio" name="especie" value="Felina">Felina</label><label><input type="radio" name="especie" value="Outra">Outra</label></span></div>
+      <div class="campo oculto" id="campoOutra"><span class="pill">Outra:</span><input class="ln" data-p="especie_outra" placeholder="qual espécie?"></div>
+      <div class="campo"><span class="pill">Raça:</span><input class="ln" data-p="raca"></div>
+    </div>
+    <div class="lin">
+      <div class="campo" style="flex:2 1 260px"><span class="pill">Nome do Responsável:</span><input class="ln" data-p="responsavel"></div>
+      <div class="campo medio"><span class="pill">CPF:</span><input class="ln" data-p="cpf" inputmode="numeric"></div>
+      <div class="campo medio"><span class="pill">Telefone:</span><input class="ln" data-p="telefone" type="tel" inputmode="tel" placeholder="opcional"></div>
+    </div>
+    <div class="lin" style="align-items:center">
+      <label class="cert"><input type="checkbox" id="certifico" style="width:18px;height:18px;margin-top:1px"> Certifico que o material enviado corresponde ao paciente descrito na ficha.</label>
+      <span class="data">Data: ${hoje}</span>
+    </div>
+    <div class="lin" style="margin-top:18px">
+      <div class="campo" style="flex:2 1 260px"><span class="pill">Médico Veterinário:</span><input class="ln" data-v="nome" list="vetsList"></div>
+      <div class="campo curto"><span class="pill">CRMV:</span><input class="ln" data-v="crmv" inputmode="numeric"></div>
+      <div class="campo medio"><span class="pill">Clínica:</span><input class="ln" data-v="clinica"></div>
+    </div>
+    <datalist id="vetsList"></datalist>
+    <hr class="div">
+    ${imagem.map(htmlSecao).join('<hr class="div">')}
+  </div>
+  <div class="folha" id="lab">
+    <div class="lab-tit">EXAMES LABORATORIAIS</div>
+    ${lab.map(htmlSecao).join('<hr class="div">')}
+  </div>
+  <div class="folha" id="s-outros">
+    <div class="secao-cab"><span class="pill sec">Outros exames e informações</span></div>
+    <label class="f"><span>Outros exames não listados acima</span><textarea data-extra="outros_exames" placeholder="Escreva aqui qualquer exame que não esteja na lista"></textarea></label>
+    <div class="lin" style="margin-top:0">
+      <div class="campo" style="flex:0 1 auto"><span class="pill">Jejum:</span><span class="seg"><label><input type="radio" name="jejum" value="Sim">Sim</label><label><input type="radio" name="jejum" value="Não">Não</label><label><input type="radio" name="jejum" value="">Não sei</label></span></div>
+    </div>
+    <label class="f" style="margin-top:14px"><span>Suspeita clínica / observações gerais</span><textarea data-extra="observacoes"></textarea></label>
+    <label class="f"><span>Medicamentos em uso</span><textarea data-extra="medicamentos" style="min-height:50px"></textarea></label>
+    <div class="rodape">Rua José do Patrocínio, 108 – Cidade Nova I – CEP 13.334-120<br>Telefones: (19) 3329-7866 / (19) 3885-3363 · WhatsApp: <a href="https://wa.me/${CONFIG.WHATSAPP}" target="_blank" rel="noopener">(19) 9 9968-0358</a> · @teclab.vet</div>
+  </div>
+  </form>
+  <div class="barra nao-imprimir"><div class="barra-in">
+    <div class="cont" id="contador">Nenhum exame marcado</div>
+    <a class="btn sec" href="#/minhas">Cancelar</a>
+    <button class="btn" id="enviar">${base&&!modelo?'Salvar alterações':'Enviar solicitação'}</button>
+  </div></div>`);
+
+  // vets usados antes (datalist)
+  api.minhas().then(rs=>{ const set=new Map(); rs.forEach(r=>{ if(r.veterinario) set.set(r.veterinario, r.crmv||''); }); if(p.nome) set.set(p.nome,p.crmv||'');
+    $('#vetsList').innerHTML=[...set].map(([n,c])=>`<option value="${h(n)}">${h(c?('CRMV '+c):'')}</option>`).join('');
+    const vn=$('[data-v=nome]'); vn.addEventListener('change',()=>{ const c=set.get(vn.value); if(c && !$('[data-v=crmv]').value) $('[data-v=crmv]').value=c; });
+  }).catch(()=>{});
+
+  const form=$('#form');
+  // navegação entre seções
+  $$('[data-ir]').forEach(a=>a.onclick=e=>{ e.preventDefault(); const alvo=document.getElementById(a.dataset.ir); if(alvo) window.scrollTo({top:alvo.getBoundingClientRect().top+scrollY-70,behavior:'smooth'}); });
+  // espécie "outra"
+  $$('input[name=especie]').forEach(r=>r.onchange=()=>$('#campoOutra').classList.toggle('oculto', $('input[name=especie]:checked')?.value!=='Outra'));
+  // itens: mostrar detalhes e contador
+  const atualizar = ()=>{
+    $$('.item').forEach(el=>el.classList.toggle('on', $('[data-ck]',el).checked));
+    const n=$$('.item [data-ck]:checked').length + ($('[data-extra=outros_exames]').value.trim()?1:0);
+    const urg=$('[data-flag=urgente]').checked;
+    $('#contador').innerHTML = n ? `<b>${n}</b> ${n===1?'item marcado':'itens marcados'}${urg?' · <b style="color:var(--verde)">URGENTE</b>':''}` : 'Nenhum exame marcado';
+  };
+  form.addEventListener('change', atualizar);
+  form.addEventListener('input', e=>{
+    const it=e.target.closest('.item'); if(it && e.target.type==='text' && e.target.value.trim()) $('[data-ck]',it).checked=true;
+    if(e.target.matches('[data-extra=outros_exames]')) atualizar();
+    if(it) atualizar();
+  });
+  $$('.sub .chips input').forEach(c=>c.addEventListener('change',()=>{ const it=c.closest('.item'); if(c.checked) $('[data-ck]',it).checked=true; atualizar(); }));
+  // mapa de biópsia
+  const pontos=[]; const mapa=$('#mapaImg');
+  const desenhar=()=>{ $$('.ponto',mapa).forEach(p=>p.remove()); pontos.forEach((pt,i)=>{ const d=document.createElement('div'); d.className='ponto'; d.style.left=pt.x+'%'; d.style.top=pt.y+'%'; d.textContent=i+1; d.onclick=e=>{e.stopPropagation(); pontos.splice(i,1); desenhar();}; mapa.appendChild(d); }); };
+  mapa.onclick=e=>{ const r=mapa.getBoundingClientRect(); pontos.push({x:+((e.clientX-r.left)/r.width*100).toFixed(1), y:+((e.clientY-r.top)/r.height*100).toFixed(1), lado:(e.clientX-r.left)/r.width<.5?'ventral':'dorsal'}); desenhar(); };
+
+  // preencher (edição / modelo / perfil)
+  const setV=(sel,v)=>{ const el=$(sel); if(el && v!=null) el.value=v; };
+  const setR=(name,v)=>{ if(v==null) return; const el=$(`input[name=${name}][value="${CSS.escape(v)}"]`); if(el) el.checked=true; };
+  const d = base?.dados;
+  setV('[data-v=nome]', d?.vet?.nome ?? p.nome); setV('[data-v=crmv]', d?.vet?.crmv ?? p.crmv); setV('[data-v=clinica]', d?.vet?.clinica ?? p.clinica);
+  if(d){
+    Object.entries(d.flags||{}).forEach(([k,v])=>{ const el=$(`[data-flag=${k}]`); if(el) el.checked=!!v; });
+    if(!modelo){
+      Object.entries(d.paciente||{}).forEach(([k,v])=>setV(`[data-p=${k}]`,v));
+      setR('sexo',d.paciente?.sexo); setR('especie',d.paciente?.especie);
+      $('#campoOutra').classList.toggle('oculto', d.paciente?.especie!=='Outra');
+      $('#certifico').checked=true;
+    }
+    (d.exames||[]).forEach(ex=>{ const it=$(`.item[data-k="${ex.k}"]`); if(!it) return; $('[data-ck]',it).checked=true;
+      (ex.lado||[]).forEach(l=>{ const c=$(`[data-lado="${l}"]`,it); if(c) c.checked=true; });
+      (ex.opts||[]).forEach(o=>{ const c=$(`[data-opt="${CSS.escape(o)}"]`,it); if(c) c.checked=true; });
+      if(ex.texto) setV(`.item[data-k="${ex.k}"] [data-texto]`, ex.texto);
+      if(ex.proj) setV(`.item[data-k="${ex.k}"] [data-proj]`, ex.proj);
+      if(ex.local) setV(`.item[data-k="${ex.k}"] [data-local]`, ex.local);
+    });
+    setR('sed', d.radiografia?.sedacao); setR('enc', d.endocrino?.encaminhar);
+    Object.entries(d.obs||{}).forEach(([k,v])=>setV(`[data-obs=${k}]`,v));
+    Object.entries(d.patologia||{}).forEach(([k,v])=>{ if(typeof v==='string') setV(`[data-pato=${k}]`,v); });
+    (d.patologia?.locais||[]).forEach(l=>{ const c=$(`[data-localbx="${CSS.escape(l)}"]`); if(c) c.checked=true; });
+    (d.patologia?.mapa||[]).forEach(pt=>pontos.push(pt)); desenhar();
+    Object.entries(d.extras||{}).forEach(([k,v])=>setV(`[data-extra=${k}]`,v));
+    setR('jejum', d.extras?.jejum ?? null);
+  }
+  atualizar();
+
+  $('#enviar').onclick = async ()=>{
+    const dados = coletar(pontos);
+    const falta=[];
+    if(!dados.paciente.nome) falta.push('nome do paciente');
+    if(!dados.paciente.especie) falta.push('espécie');
+    if(dados.paciente.especie==='Outra' && !dados.paciente.especie_outra) falta.push('qual espécie');
+    if(!dados.vet.nome) falta.push('médico veterinário');
+    if(!dados.vet.crmv) falta.push('CRMV');
+    if(!dados.exames.length && !dados.extras.outros_exames) falta.push('pelo menos um exame');
+    if(!$('#certifico').checked) falta.push('marcar "Certifico que o material enviado corresponde ao paciente"');
+    if(falta.length){ await modal({titulo:'Falta preencher', html:`<p>Antes de enviar, complete:</p><ul>${falta.map(f=>`<li>${h(f)}</li>`).join('')}</ul>`, ok:'Entendi', cancelar:'Fechar'}); return; }
+    const linha = {
+      dados,
+      paciente: dados.paciente.nome,
+      especie: dados.paciente.especie==='Outra' ? dados.paciente.especie_outra : dados.paciente.especie,
+      responsavel: dados.paciente.responsavel,
+      clinica: dados.vet.clinica, veterinario: dados.vet.nome, crmv: dados.vet.crmv,
+      urgente: !!dados.flags.urgente,
+    };
+    const b=$('#enviar'); b.disabled=true; b.textContent='Enviando…';
+    try{
+      let r;
+      if(base && !modelo){ r = await api.atualizar(base.id, linha); toast('Alterações salvas.'); }
+      else { r = await api.criar(linha); }
+      location.hash = '#/ver/'+r.id+(base&&!modelo?'':'?enviada=1');
+    }catch(e){ b.disabled=false; b.textContent='Enviar solicitação'; await modal({titulo:'Não foi possível enviar', html:`<p>${h(traduzErro(e))}</p>`, ok:'OK', cancelar:'Fechar'}); }
+  };
+}
+
+function coletar(pontos){
+  const val = s => ($(s)?.value||'').trim();
+  const radio = n => $(`input[name=${n}]:checked`)?.value ?? null;
+  const exames = [];
+  CATALOGO.forEach(sec=>sec.itens.forEach((it,i)=>{
+    const el=$(`.item[data-k="${sec.id}-${i}"]`); if(!el || !$('[data-ck]',el).checked) return;
+    const ex = { k:`${sec.id}-${i}`, secao:sec.titulo, nome:it.n };
+    const lado=$$('[data-lado]:checked',el).map(c=>c.dataset.lado); if(lado.length) ex.lado=lado;
+    const opts=$$('[data-opt]:checked',el).map(c=>c.dataset.opt); if(opts.length) ex.opts=opts;
+    const t=$('[data-texto]',el)?.value.trim(); if(t) ex.texto=t;
+    const pj=$('[data-proj]',el)?.value.trim(); if(pj) ex.proj=pj;
+    const lc=$('[data-local]',el)?.value.trim(); if(lc) ex.local=lc;
+    if(it.d) ex.composicao=it.d;
+    if(it.jejum) ex.jejum12h=true;
+    ex.descricao = descreverExame(ex);
+    exames.push(ex);
+  }));
+  const flags={}; $$('[data-flag]').forEach(c=>flags[c.dataset.flag]=c.checked);
+  const obs={}; $$('[data-obs]').forEach(c=>{ if(c.value.trim()) obs[c.dataset.obs]=c.value.trim(); });
+  const pato={}; $$('[data-pato]').forEach(c=>{ if(c.value.trim()) pato[c.dataset.pato]=c.value.trim(); });
+  pato.locais=$$('[data-localbx]:checked').map(c=>c.dataset.localbx);
+  pato.mapa=pontos.slice();
+  const extras={}; $$('[data-extra]').forEach(c=>{ if(c.value.trim()) extras[c.dataset.extra]=c.value.trim(); });
+  const jj=radio('jejum'); if(jj) extras.jejum=jj;
+  return {
+    versao:1,
+    data: new Date().toLocaleDateString('pt-BR'),
+    flags,
+    paciente:{ nome:val('[data-p=nome]').toUpperCase(), sexo:radio('sexo'), idade:val('[data-p=idade]'), especie:radio('especie'), especie_outra:val('[data-p=especie_outra]'), raca:val('[data-p=raca]'), responsavel:val('[data-p=responsavel]'), cpf:val('[data-p=cpf]'), telefone:val('[data-p=telefone]') },
+    vet:{ nome:val('[data-v=nome]'), crmv:val('[data-v=crmv]'), clinica:val('[data-v=clinica]') },
+    exames,
+    radiografia:{ sedacao: radio('sed') },
+    endocrino:{ encaminhar: radio('enc') || null },
+    obs, patologia:pato, extras,
+  };
+}
+function descreverExame(ex){
+  let s = ex.nome;
+  if(ex.texto) s += ': ' + ex.texto;
+  if(ex.lado) s += ' (' + ex.lado.map(l=>l==='D'?'Direito':'Esquerdo').join(' e ') + ')';
+  if(ex.opts) s += ' – ' + ex.opts.join(' + ');
+  if(ex.proj) s += ' – projeção: ' + ex.proj;
+  if(ex.local) s += ' – local: ' + ex.local;
+  return s;
+}
+function textoSolicitacao(r){
+  if(!r) return '';
+  const d=r.dados, p=d.paciente, f=d.flags||{};
+  const L=[];
+  L.push(`${cod(r.id)} — ${STATUS[r.status]?.t||r.status} — enviada em ${dh(r.criado_em)}`);
+  const fl=[f.urgente&&'URGENTE (com taxa)',f.petlove&&'PET LOVE',f.convenio&&'Convênio',f.pago&&'Pago'].filter(Boolean); if(fl.length) L.push('Marcações: '+fl.join(', '));
+  L.push(`Paciente: ${p.nome} | Sexo: ${p.sexo||'-'} | Idade: ${p.idade||'-'} | Espécie: ${p.especie==='Outra'?p.especie_outra:(p.especie||'-')} | Raça: ${p.raca||'-'}`);
+  L.push(`Responsável: ${p.responsavel||'-'} | CPF: ${p.cpf||'-'} | Telefone: ${p.telefone||'-'}`);
+  L.push(`Veterinário: ${d.vet.nome} | CRMV: ${d.vet.crmv||'-'} | Clínica: ${d.vet.clinica||'-'}`);
+  L.push('Exames:'); d.exames.forEach(e=>L.push(`  - [${e.secao}] ${e.descricao}`));
+  if(d.extras?.outros_exames) L.push('Outros exames: '+d.extras.outros_exames);
+  if(d.radiografia?.sedacao) L.push('Radiografia – sedação: '+d.radiografia.sedacao);
+  if(d.endocrino?.encaminhar) L.push('Endocrinologia – encaminhar para: '+d.endocrino.encaminhar);
+  Object.entries(d.obs||{}).forEach(([k,v])=>L.push(`Obs./suspeita (${k==='rx'?'radiografia':k==='us'?'ultrassom':k}): ${v}`));
+  const pt=d.patologia||{}; if(pt.lesao||pt.tempo||pt.obs||pt.locais?.length||pt.outro_local||pt.mapa?.length){
+    L.push(`Patologia – lesão: ${pt.lesao||'-'} | tempo de evolução: ${pt.tempo||'-'} | obs.: ${pt.obs||'-'}`);
+    const locs=[...(pt.locais||[]), pt.outro_local].filter(Boolean); if(locs.length) L.push('Local da biópsia/citologia: '+locs.join(', '));
+    if(pt.mapa?.length) L.push(`Pontos marcados na silhueta: ${pt.mapa.length} (${pt.mapa.map(m=>m.lado).join(', ')})`);
+  }
+  if(d.extras?.jejum) L.push('Jejum: '+d.extras.jejum);
+  if(d.extras?.observacoes) L.push('Suspeita/observações: '+d.extras.observacoes);
+  if(d.extras?.medicamentos) L.push('Medicamentos: '+d.extras.medicamentos);
+  if(r.ficha_workvet) L.push('Ficha WorkVet: '+r.ficha_workvet);
+  if(r.motivo_recusa) L.push('Motivo da recusa: '+r.motivo_recusa);
+  return L.join('\n');
+}
+
+/* ================== VER / IMPRIMIR ================== */
+async function telaVer(id){
+  const r = await api.obter(id);
+  if(!r){ moldura(`<div class="vazio">Solicitação não encontrada.</div>`); return; }
+  const d=r.dados, p=d.paciente, f=d.flags||{}, st=STATUS[r.status]||{t:r.status,c:''};
+  const meu = r.user_id === await api.uid();
+  const recemEnviada = /enviada=1/.test(location.hash);
+  const grupos = {};
+  d.exames.forEach(e=>(grupos[e.secao] ||= []).push(e));
+  const pt=d.patologia||{};
+  const locs=[...(pt.locais||[]), pt.outro_local].filter(Boolean);
+  const flagsTxt=[f.convenio&&'Convênio',f.pago&&'Pago',f.petlove&&'PET LOVE'].filter(Boolean);
+  let acoesEq='';
+  if(estado.equipe){
+    acoesEq = `<div class="acoes-equipe">
+      <div class="esp"><b>Recepção Tec Lab</b><br>${r.status==='enviada'?'Confira e aceite a solicitação.':r.status==='aceita'?`Aceita em ${dh(r.aceita_em)}. Pronta para cadastrar no WorkVet.`:r.status==='cadastrada'?`Cadastrada no WorkVet${r.ficha_workvet?' – ficha nº '+h(r.ficha_workvet):''} em ${dh(r.cadastrada_em)}.`:r.status==='recusada'?'Recusada: '+h(r.motivo_recusa||''):'Cancelada pelo solicitante.'}</div>
+      ${r.status==='enviada'?`<button class="btn" data-ac="aceitar">✓ Aceitar</button><button class="btn perigo" data-ac="recusar">Recusar</button>`:''}
+      ${r.status==='aceita'?`<button class="btn" data-ac="cadastrada">Marcar como cadastrada</button><button class="btn sec" data-ac="voltar">Voltar para "aguardando"</button>`:''}
+      ${r.status==='cadastrada'?`<button class="btn sec" data-ac="ficha">Alterar nº da ficha</button>`:''}
+      ${r.status==='recusada'?`<button class="btn sec" data-ac="voltar">Reabrir</button>`:''}
+      <button class="btn sec" data-ac="copiar">Copiar texto</button>
+    </div>`;
+  }
+  moldura(`
+  ${recemEnviada?`<div class="msg ok nao-imprimir"><b>Solicitação enviada!</b> Código <b>${cod(r.id)}</b>. A recepção do Tec Lab vai conferir e aceitar; acompanhe aqui em "Minhas solicitações". Se quiser, escreva o código no material enviado.</div>`:''}
+  ${acoesEq}
+  <div class="ver-cab nao-imprimir">
+    <a class="btn sec peq" href="${estado.equipe?'#/painel':'#/minhas'}">← Voltar</a><div class="esp"></div>
+    ${meu && r.status==='enviada' ? `<a class="btn sec peq" href="#/editar/${r.id}">Editar</a><button class="btn perigo peq" id="cancelar">Cancelar solicitação</button>`:''}
+    ${meu ? `<a class="btn sec peq" href="#/modelo/${r.id}">Usar como modelo</a>`:''}
+    <button class="btn peq" onclick="print()">Imprimir / PDF</button>
+  </div>
+  <div class="folha">
+    <div class="cab">
+      <div class="marca"><img src="${LOGO}" alt="Tec Lab"><div>Centro Diagnóstico Veterinário</div></div>
+      <div class="dir"><h1>Requisição Individual de Exames</h1>
+        <div class="cod">${cod(r.id)}</div>
+        <div style="margin-top:6px"><span class="st ${st.c}">${st.t}${r.status==='cadastrada'&&r.ficha_workvet?' · ficha '+h(r.ficha_workvet):''}</span>${r.urgente?'<span class="tag-urg">URGENTE (com taxa)</span>':''}</div>
+        ${flagsTxt.length?`<div class="flags" style="font-size:17px">${flagsTxt.map(t=>`<span>☑ ${t}</span>`).join('')}</div>`:''}
+        ${r.status==='recusada'&&r.motivo_recusa?`<div class="msg erro" style="margin-top:10px">Motivo: ${h(r.motivo_recusa)}</div>`:''}
+      </div>
+    </div>
+    <div class="dados-grade">
+      <div class="dado"><span>Paciente</span><b>${h(p.nome)}</b></div>
+      <div class="dado"><span>Espécie / raça</span><b>${h(p.especie==='Outra'?p.especie_outra:p.especie)}${p.raca?' – '+h(p.raca):''}</b></div>
+      <div class="dado"><span>Sexo / idade</span><b>${h(p.sexo||'–')} · ${h(p.idade||'–')}</b></div>
+      <div class="dado"><span>Responsável</span><b>${h(p.responsavel||'–')}</b></div>
+      <div class="dado"><span>CPF</span><b>${h(p.cpf||'–')}</b></div>
+      <div class="dado"><span>Telefone</span><b>${h(p.telefone||'–')}</b></div>
+      <div class="dado"><span>Médico veterinário</span><b>${h(d.vet.nome)}</b></div>
+      <div class="dado"><span>CRMV</span><b>${h(d.vet.crmv||'–')}</b></div>
+      <div class="dado"><span>Clínica</span><b>${h(d.vet.clinica||'–')}</b></div>
+      <div class="dado"><span>Enviada em</span><b>${dh(r.criado_em)}</b></div>
+    </div>
+    <hr class="div">
+    ${Object.entries(grupos).map(([sec,exs])=>`<div class="ver-sec"><span class="pill sec">${h(sec)}</span><ul>${exs.map(e=>`<li>${h(e.descricao)}${e.composicao?` <small>(${h(e.composicao)})</small>`:''}${e.jejum12h?' <small><b>Jejum 12h</b></small>':''}</li>`).join('')}</ul>
+      ${sec==='Radiografia Simples'&&d.radiografia?.sedacao?`<p style="margin:6px 0 0 20px">Sedação: <b>${h(d.radiografia.sedacao)}</b></p>`:''}
+      ${sec==='Radiografia Simples'&&d.obs?.rx?`<p style="margin:6px 0 0 20px">Obs./suspeita: ${h(d.obs.rx)}</p>`:''}
+      ${sec==='Ultrassonografia'&&d.obs?.us?`<p style="margin:6px 0 0 20px">Obs./suspeita: ${h(d.obs.us)}</p>`:''}
+      ${sec==='Endocrinologia'&&d.endocrino?.encaminhar?`<p style="margin:6px 0 0 20px">Encaminhar para: <b>${h(d.endocrino.encaminhar)}</b></p>`:''}
+    </div>`).join('')}
+    ${d.extras?.outros_exames?`<div class="ver-sec"><span class="pill sec">Outros exames</span><p style="margin:8px 0 0;white-space:pre-wrap">${h(d.extras.outros_exames)}</p></div>`:''}
+    ${(pt.lesao||pt.tempo||pt.obs||locs.length||pt.mapa?.length)?`<div class="ver-sec"><span class="pill sec">Patologia – dados da lesão</span>
+      <div class="mapa-wrap"><div style="flex:1;min-width:220px;font-size:15px;line-height:1.6">
+        ${pt.lesao?`<div><b>Lesão:</b> ${h(pt.lesao)}</div>`:''}${pt.tempo?`<div><b>Tempo de evolução:</b> ${h(pt.tempo)}</div>`:''}${pt.obs?`<div><b>Obs./suspeita:</b> ${h(pt.obs)}</div>`:''}
+        ${locs.length?`<div><b>Localização:</b> ${h(locs.join(', '))}</div>`:''}</div>
+        ${pt.mapa?.length?`<div class="mapa" style="width:260px"><div class="rot"><span>Ventral</span><span>Dorsal</span></div><div class="img" style="cursor:default"><img src="${CORPO}" alt="">${pt.mapa.map((m,i)=>`<div class="ponto" style="left:${+m.x}%;top:${+m.y}%;cursor:default">${i+1}</div>`).join('')}</div></div>`:''}
+      </div></div>`:''}
+    ${(d.extras?.jejum||d.extras?.observacoes||d.extras?.medicamentos)?`<div class="ver-sec"><span class="pill sec">Informações clínicas</span><div style="margin-top:8px;font-size:15px;line-height:1.6;white-space:pre-wrap">${d.extras.jejum?`<div><b>Jejum:</b> ${h(d.extras.jejum)}</div>`:''}${d.extras.observacoes?`<div><b>Suspeita / observações:</b> ${h(d.extras.observacoes)}</div>`:''}${d.extras.medicamentos?`<div><b>Medicamentos em uso:</b> ${h(d.extras.medicamentos)}</div>`:''}</div></div>`:''}
+    <p class="cert" style="margin-top:20px">☑ Certifico que o material enviado corresponde ao paciente descrito na ficha.</p>
+    <div class="rodape">Rua José do Patrocínio, 108 – Cidade Nova I – CEP 13.334-120<br>Telefones: (19) 3329-7866 / (19) 3885-3363 · WhatsApp: (19) 9 9968-0358 · @teclab.vet</div>
+  </div>`);
+  $('#cancelar')?.addEventListener('click', async ()=>{
+    if(!await modal({titulo:'Cancelar solicitação?', html:`<p>${cod(r.id)} – ${h(p.nome)}. A recepção não vai mais receber este pedido.</p>`, ok:'Cancelar solicitação', cancelar:'Voltar', perigo:true})) return;
+    try{ await api.atualizar(r.id,{status:'cancelada'}); toast('Solicitação cancelada.'); telaVer(r.id); }catch(e){ toast(traduzErro(e)); }
+  });
+  $$('[data-ac]').forEach(b=>b.onclick=async ()=>{
+    const ac=b.dataset.ac; let patch=null;
+    try{
+      if(ac==='aceitar') patch={status:'aceita', aceita_em:new Date().toISOString(), aceita_por: await api.uid()};
+      if(ac==='recusar'){ const v=await modal({titulo:'Recusar solicitação', campos:[{k:'motivo',rotulo:'Motivo (o veterinário vai ver)',obrig:true}], ok:'Recusar', perigo:true}); if(!v) return; patch={status:'recusada', motivo_recusa:v.motivo}; }
+      if(ac==='cadastrada'||ac==='ficha'){ const v=await modal({titulo:'Cadastrada no WorkVet', campos:[{k:'ficha',rotulo:'Nº da ficha no WorkVet',valor:r.ficha_workvet||'',ph:'ex.: 0107407'}], ok:'Salvar'}); if(!v) return; patch={status:'cadastrada', ficha_workvet:v.ficha||null, cadastrada_em:r.cadastrada_em||new Date().toISOString()}; }
+      if(ac==='voltar') patch={status:'enviada', motivo_recusa:null};
+      if(ac==='copiar'){ await navigator.clipboard.writeText(textoSolicitacao(r)); toast('Texto copiado.'); return; }
+      await api.atualizar(r.id, patch); toast('Atualizado.'); telaVer(r.id);
+    }catch(e){ toast(traduzErro(e),4000); }
+  });
+}
+
+/* ================== MINHAS SOLICITAÇÕES ================== */
+function resumoExames(r){
+  const n=r.dados?.exames||[]; const nomes=n.map(e=>e.nome);
+  if(r.dados?.extras?.outros_exames) nomes.push('outros: '+r.dados.extras.outros_exames.slice(0,40));
+  return h(nomes.slice(0,4).join(', ')) + (nomes.length>4?` <span style="color:var(--suave)">+${nomes.length-4}</span>`:'');
+}
+async function telaMinhas(){
+  moldura(`<div class="carregando">Carregando…</div>`);
+  let rs=[]; try{ rs=await api.minhas(); }catch(e){ moldura(`<div class="msg erro">${h(traduzErro(e))}</div>`); return; }
+  moldura(`
+  <div class="cab-lista"><h2>Minhas solicitações</h2><a class="btn" href="#/nova">+ Nova solicitação</a></div>
+  ${rs.length? rs.map(r=>{ const st=STATUS[r.status]||{t:r.status,c:''}; return `
+    <div class="cartao">
+      <div class="info">
+        <div class="t">${h(r.paciente)} <span style="font-weight:normal;color:var(--suave)">· ${h(r.especie||'')}</span>${r.urgente?'<span class="tag-urg">URGENTE</span>':''}</div>
+        <div class="m">${cod(r.id)} · ${dh(r.criado_em)}${r.veterinario?' · '+h(r.veterinario):''}</div>
+        <div class="ex">${resumoExames(r)}</div>
+        ${r.status==='recusada'&&r.motivo_recusa?`<div class="m" style="color:var(--erro)">Motivo: ${h(r.motivo_recusa)}</div>`:''}
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end">
+        <span class="st ${st.c}">${st.t}${r.status==='cadastrada'&&r.ficha_workvet?' · ficha '+h(r.ficha_workvet):''}</span>
+        <div class="acoes"><a class="btn sec peq" href="#/ver/${r.id}">Ver</a>${r.status==='enviada'?`<a class="btn sec peq" href="#/editar/${r.id}">Editar</a>`:''}<a class="btn sec peq" href="#/modelo/${r.id}">Repetir</a></div>
+      </div>
+    </div>`; }).join('') : `<div class="vazio">Você ainda não fez nenhuma solicitação.<br><br><a class="btn" href="#/nova">Fazer a primeira</a></div>`}`);
+}
+
+/* ================== PAINEL DA EQUIPE ================== */
+async function telaPainel(){
+  if(!estado.equipe){ location.hash='#/minhas'; return; }
+  moldura(`<div class="carregando">Carregando…</div>`);
+  let todas=[]; try{ todas=await api.todas(null); }catch(e){ moldura(`<div class="msg erro">${h(traduzErro(e))}</div>`); return; }
+  const cont = s => todas.filter(r=>r.status===s).length;
+  const abas=[['enviada','Novas'],['aceita','Aceitas'],['cadastrada','Cadastradas'],['recusada','Recusadas'],['cancelada','Canceladas'],['','Todas']];
+  const f=estado.painelFiltro, q=estado.busca.toLowerCase();
+  const lista = todas.filter(r=>(!f||r.status===f) && (!q || [cod(r.id),r.paciente,r.clinica,r.veterinario,r.responsavel,r.ficha_workvet].join(' ').toLowerCase().includes(q)));
+  document.title = (cont('enviada')?`(${cont('enviada')}) `:'') + 'Painel · Solicitações Tec Lab';
+  moldura(`
+  <div class="cab-lista"><h2>Painel Tec Lab</h2>
+    <input class="busca" id="busca" placeholder="Buscar paciente, clínica, vet, código…" value="${h(estado.busca)}">
+    <button class="btn sec peq" id="csv">Exportar planilha</button></div>
+  <div class="abas">${abas.map(([s,t])=>`<button data-f="${s}" class="${f===s?'on':''}">${t}${s?`<span class="n">${cont(s)}</span>`:''}</button>`).join('')}</div>
+  ${lista.length?`<table class="tabela"><thead><tr><th>Código</th><th>Recebida</th><th>Clínica / Vet</th><th>Paciente</th><th class="opc">Exames</th><th>Situação</th></tr></thead><tbody>
+  ${lista.map(r=>{ const st=STATUS[r.status]||{t:r.status,c:''}; return `<tr class="click ${r.status==='enviada'?'novo':''}" data-id="${r.id}">
+    <td><b>${cod(r.id)}</b>${r.urgente?'<br><span class="tag-urg" style="margin:0">URGENTE</span>':''}</td>
+    <td>${dataBR(r.criado_em)}<br><span style="color:var(--suave)">${horaBR(r.criado_em)}</span></td>
+    <td>${h(r.clinica||'–')}<br><span style="color:var(--suave)">${h(r.veterinario||'')}${r.crmv?' · '+h(r.crmv):''}</span></td>
+    <td>${h(r.paciente)}<br><span style="color:var(--suave)">${h(r.especie||'')}${r.responsavel?' · '+h(r.responsavel):''}</span></td>
+    <td class="opc">${resumoExames(r)}</td>
+    <td><span class="st ${st.c}">${st.t}</span>${r.ficha_workvet?`<br><span style="font-size:12px">ficha ${h(r.ficha_workvet)}</span>`:''}</td></tr>`; }).join('')}
+  </tbody></table>`:`<div class="vazio">Nenhuma solicitação ${f?'nesta aba':''}.</div>`}`);
+  $$('.abas button').forEach(b=>b.onclick=()=>{ estado.painelFiltro=b.dataset.f; telaPainel(); });
+  $$('tr[data-id]').forEach(tr=>tr.onclick=()=>location.hash='#/ver/'+tr.dataset.id);
+  const bs=$('#busca'); let tm; bs.oninput=()=>{ clearTimeout(tm); tm=setTimeout(()=>{ estado.busca=bs.value; telaPainel().then(()=>{ const n=$('#busca'); n.focus(); n.setSelectionRange(n.value.length,n.value.length); }); },300); };
+  $('#csv').onclick=()=>exportarCSV(lista);
+  clearInterval(estado.pollTimer);
+  const novasAntes=cont('enviada');
+  estado.pollTimer=setInterval(async ()=>{
+    if(!location.hash.startsWith('#/painel')){ clearInterval(estado.pollTimer); return; }
+    try{ const n=await api.contar('enviada'); if(n!==novasAntes){ if(n>novasAntes) toast('Nova solicitação recebida!'); if(!$('.modal-fundo') && document.activeElement?.id!=='busca') telaPainel(); } }catch{}
+  }, 30000);
+}
+function exportarCSV(rs){
+  const cab=['Código','Recebida em','Situação','Urgente','Clínica','Veterinário','CRMV','Paciente','Espécie','Raça','Sexo','Idade','Responsável','CPF','Telefone','Exames','Outros exames','Observações','Ficha WorkVet'];
+  const esc=v=>`"${String(v??'').replace(/"/g,'""')}"`;
+  const linhas=rs.map(r=>{ const d=r.dados||{}, p=d.paciente||{}; return [cod(r.id),dh(r.criado_em),STATUS[r.status]?.t||r.status,r.urgente?'Sim':'',r.clinica,r.veterinario,r.crmv,r.paciente,r.especie,p.raca,p.sexo,p.idade,r.responsavel,p.cpf,p.telefone,(d.exames||[]).map(e=>e.descricao).join(' | '),d.extras?.outros_exames,d.extras?.observacoes,r.ficha_workvet].map(esc).join(';'); });
+  const blob=new Blob(['﻿'+[cab.map(esc).join(';'),...linhas].join('\r\n')],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`solicitacoes-teclab-${new Date().toISOString().slice(0,10)}.csv`; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+}
+
+/* ================== MEU CADASTRO ================== */
+async function telaPerfil(){
+  const p=estado.perfil||{};
+  moldura(`<div class="login" style="margin-top:10px"><h2>Meu cadastro</h2>
+    <p style="font-size:14px;color:var(--suave);margin-top:-8px">Esses dados já vêm preenchidos em cada nova solicitação.</p>
+    <label class="f"><span>Clínica</span><input id="clinica" value="${h(p.clinica||'')}"></label>
+    <label class="f"><span>Médico(a)-veterinário(a) responsável</span><input id="nome" value="${h(p.nome||'')}"></label>
+    <label class="f"><span>CRMV</span><input id="crmv" value="${h(p.crmv||'')}"></label>
+    <label class="f"><span>WhatsApp</span><input id="telefone" value="${h(p.telefone||'')}"></label>
+    <label class="f"><span>E-mail de login</span><input value="${h(p.email||'')}" disabled></label>
+    <button class="btn" id="salvar">Salvar</button></div>`);
+  $('#salvar').onclick=async ()=>{ const v=id=>$('#'+id).value.trim(); try{ await api.salvarPerfil({clinica:v('clinica'),nome:v('nome'),crmv:v('crmv'),telefone:v('telefone')}); estado.perfil=await api.perfil(); toast('Cadastro salvo.'); location.hash='#/'; }catch(e){ toast(traduzErro(e),4000); } };
+}
+
+/* ================== ROTEADOR ================== */
+async function rota(){
+  try{
+    if(/type=recovery/.test(location.hash) || estado.recuperacao){ estado.recuperacao=true; if(await api.sessao()) return telaLogin('nova'); }
+    const s = await api.sessao();
+    if(!s) return telaLogin();
+    if(!estado.perfil){ estado.perfil = await api.perfil(); estado.equipe = await api.ehEquipe(); }
+    const [ , r, id ] = (location.hash.split('?')[0] || '#/').split('/');
+    if(r!=='painel'){ document.title='Solicitações online · Tec Lab'; }
+    switch(r){
+      case 'nova': return telaForm();
+      case 'editar': return telaForm(id);
+      case 'modelo': return telaForm(id,{modelo:true});
+      case 'ver': return telaVer(id);
+      case 'minhas': return telaMinhas();
+      case 'perfil': return telaPerfil();
+      case 'painel': return telaPainel();
+      default: return estado.equipe ? telaPainel() : telaMinhas();
+    }
+  }catch(e){ app.innerHTML=`<main><div class="msg erro">${h(traduzErro(e))}</div><button class="btn" onclick="location.reload()">Tentar de novo</button></main>`; }
+}
+api.onAuth(ev=>{ if(ev==='PASSWORD_RECOVERY'){ estado.recuperacao=true; telaLogin('nova'); } else if(ev==='SIGNED_OUT'){ estado.perfil=null; } });
+window.addEventListener('hashchange', ()=>{ if(!/access_token|type=recovery/.test(location.hash)) rota(); });
+rota();
+if('serviceWorker' in navigator && location.protocol==='https:' && !DEMO) navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>
